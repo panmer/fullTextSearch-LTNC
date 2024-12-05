@@ -131,7 +131,6 @@
     const timeTaken = document.getElementById('timeTaken');
     const timingSection = document.getElementById('timing');
 
-    // Handle Enter key in search bar
     searchBar.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
             const query = searchBar.value.trim();
@@ -141,15 +140,12 @@
         }
     });
 
-    // Fetch data from the endpoint
     async function fetchData(query) {
         try {
-            // Show loading spinner
             loading.style.display = 'block';
             noResults.style.display = 'none';
             timingSection.style.display = 'none';
 
-            // Start timer
             const startTime = performance.now();
 
             const response = await fetch('http://127.0.0.1:5000/search', {
@@ -166,27 +162,22 @@
 
             const data = await response.json();
 
-            // End timer and calculate elapsed time
             const endTime = performance.now();
             const elapsedTime = Math.round(endTime - startTime);
 
-            // Update timing section
             timeTaken.textContent = elapsedTime;
             timingSection.style.display = 'block';
 
-            // Extract 'results' from the response and update the table
             updateTable(data.results);
         } catch (error) {
             console.error('Fetch error:', error);
         } finally {
-            // Hide loading spinner
             loading.style.display = 'none';
         }
     }
 
-    // Update table with fetched data
+
     function updateTable(results) {
-        // Clear previous table rows
         tableBody.innerHTML = '';
 
         if (results.length === 0) {
@@ -196,7 +187,7 @@
             noResults.style.display = 'none';
         }
 
-        // Add new rows
+
         results.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
