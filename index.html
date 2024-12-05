@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search and Display Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #555;
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #timing {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+        }
+
+        /* Loading spinner styles */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ccc;
+            border-top: 3px solid #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tìm kiếm giao dịch</h1>
+        <input type="text" id="searchBar" placeholder="Type your query and press Enter..." />
+        <div id="timing" style="color:green;margin:auto">Tìm kiếm trong <span id="timeTaken">0</span> ms</div>
+        <div class="loading" id="loading">
+            <span></span>
+            <p>Đang tải...</p>
+        </div>
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>Giao dịch số</th> <th>Thời gian</th> <th>Chi tiết</th> <th>Cộng thêm</th> <th>Trừ bớt</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+
+        <p id="noResults" class="no-results" style="display: none;">No results found</p> </div>
+
+<script>
+    const searchBar = document.getElementById('searchBar');
+    const tableBody = document.getElementById('tableBody');
+    const noResults = document.getElementById('noResults');
+    const loading = document.getElementById('loading');
+    const timeTaken = document.getElementById('timeTaken');
+    const timingSection = document.getElementById('timing');
+
+    // Handle Enter key in search bar
+    searchBar.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            const query = searchBar.value.trim();
+            if (query) {
+                fetchData(query);
+            }
+        }
+    });
+
+    // Fetch data from the endpoint
+    async function fetchData(query) {
+        try {
+            // Show loading spinner
+            loading.style.display = 'block';
+            noResults.style.display = 'none';
+            timingSection.style.display = 'none';
+
+            // Start timer
+            const startTime = performance.now();
+
+            const response = await fetch('http://127.0.0.1:5000/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+
+            // End timer and calculate elapsed time
+            const endTime = performance.now();
+            const elapsedTime = Math.round(endTime - startTime);
+
+            // Update timing section
+            timeTaken.textContent = elapsedTime;
+            timingSection.style.display = 'block';
+
+            // Extract 'results' from the response and update the table
+            updateTable(data.results);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        } finally {
+            // Hide loading spinner
+            loading.style.display = 'none';
+        }
+    }
+
+    // Update table with fetched data
+    function updateTable(results) {
+        // Clear previous table rows
+        tableBody.innerHTML = '';
+
+        if (results.length === 0) {
+            noResults.style.display = 'block';
+            return;
+        } else {
+            noResults.style.display = 'none';
+        }
+
+        // Add new rows
+        results.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.trans_no}</td>
+                <td>${item["﻿\"date_time\""]}</td>
+                <td>${item.detail}</td>
+                <td>${item.credit}</td>
+                <td>${item.debit}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+</script>
+</body> </html>
