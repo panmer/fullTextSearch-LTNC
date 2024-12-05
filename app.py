@@ -1,10 +1,13 @@
 from flask import Flask, request, jsonify
 from fullTextSearch import fullTextSearch
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
 csv_filepath = os.path.join(os.path.dirname(__file__), 'chuyen_khoan.csv')
 fts = fullTextSearch(filename=csv_filepath)
+
+CORS(app)
 
 @app.route('/', methods=['GET'])
 def home():
