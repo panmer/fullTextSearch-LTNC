@@ -3,53 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search and Display Table</title>
+    <title>Tìm kiếm giao dịch MTTQVN</title>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #f3fef3; /* Soft green background */
             color: #333;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 128, 0, 0.2); /* Green shadow */
+            border-radius: 12px;
+            border: 2px solid #8bc34a; /* Green border */
         }
 
         h1 {
             text-align: center;
-            color: #555;
+            color: #4caf50; /* Primary green color */
+            font-weight: bold;
         }
 
+        /* Search Bar */
         #searchBar {
-            width: 100%;
+            width: calc(100% - 24px);
             padding: 12px;
             font-size: 16px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 2px solid #8bc34a; /* Green border */
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #f9fff9;
+            color: #333;
         }
 
-        #timing {
-            font-size: 14px;
-            color: #555;
+        #searchBar:focus {
+            outline: none;
+            border-color: #4caf50;
+            background-color: #e8ffe8;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Filters Section */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
             margin-bottom: 20px;
         }
 
+        .filters label {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .filters input {
+            padding: 8px;
+            font-size: 14px;
+            border: 2px solid #8bc34a;
+            border-radius: 6px;
+            background-color: #f9fff9;
+            color: #333;
+        }
+
+        .filters input:focus {
+            outline: none;
+            border-color: #4caf50;
+            background-color: #e8ffe8;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Timing Section */
+        #timing {
+            font-size: 14px;
+            color: #4caf50;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            overflow: hidden;
+            border-radius: 8px;
         }
 
         table, th, td {
-            border: 1px solid #ccc;
+            border: 2px solid #8bc34a; /* Green border */
         }
 
         th, td {
@@ -58,94 +109,136 @@
         }
 
         th {
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #4caf50; /* Green header */
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         td {
-            background-color: #fff;
+            background-color: #f9fff9;
         }
 
         tr:nth-child(even) td {
-            background-color: #f9f9f9;
+            background-color: #e8ffe8; /* Light green for alternating rows */
+        }
+
+        table tbody tr:hover {
+            background-color: #c8ffc8; /* Highlight on hover */
+            transition: background-color 0.3s ease;
         }
 
         .no-results {
             text-align: center;
-            color: #888;
+            color: #555;
             margin-top: 20px;
+            font-style: italic;
         }
 
-        /* Loading spinner styles */
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
+        /* Button Styling (optional) */
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #4caf50;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 128, 0, 0.2);
         }
 
-        .loading span {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #ccc;
-            border-top: 3px solid #333;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        button:hover {
+            background-color: #45a049;
+            box-shadow: 0 4px 8px rgba(0, 128, 0, 0.4);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+        .sort-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: white;
+            background-color: #4caf50;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 128, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .sort-button:hover {
+            background-color: #45a049;
+            box-shadow: 0 4px 8px rgba(0, 128, 0, 0.4);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Tìm kiếm giao dịch</h1>
-        <input type="text" id="searchBar" placeholder="Type your query and press Enter..." />
-        <div id="timing" style="color:green;margin:auto">Tìm kiếm trong <span id="timeTaken">0</span> ms</div>
-        <div class="loading" id="loading">
-            <span></span>
-            <p>Đang tải...</p>
+        <h1>Tìm kiếm giao dịch MTTQVN</h1>
+        <input type="text" id="searchBar" placeholder="Chọn từ khóa và bộ lọc mong muốn và nhán Enter..." />
+        <div class="filters">
+            <label>
+                Ngày bắt đầu
+                <input type="date" id="startDate" />
+            </label>
+            <label>
+                Ngày kết thúc
+                <input type="date" id="endDate" />
+            </label>
+            <label>
+                Số tiền nhỏ nhất
+                <input type="number" id="minDebit" min="0" placeholder="0" />
+            </label>
+            <label>
+                Số tiền lớn nhất
+                <input type="number" id="maxDebit" min="0" placeholder="Unlimited" />
+            </label>
         </div>
+        <div id="timing">Thời gian tìm kiếm: <span id="timeTaken">0</span> ms</div>
+
+        <button class="sort-button" id="sortButton" data-order="unsorted">Thứ tự tổng tiền: Không</button>
+
         <table id="resultTable">
             <thead>
                 <tr>
-                    <th>Giao dịch số</th> <th>Thời gian</th> <th>Chi tiết</th> <th>Cộng thêm</th> <th>Trừ bớt</th>
+                    <th>STT</th>
+                    <th>Ngày</th>
+                    <th>Lời nhán</th>
+                    <th>Tổng tiền</th>
+                    <!-- <th>Debit</th> -->
                 </tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+            <tbody id="tableBody">
+                <!-- Rows will be dynamically added here -->
+            </tbody>
         </table>
+        <p id="noResults" class="no-results" style="display: none;">No results found</p>
+    </div>
 
-        <p id="noResults" class="no-results" style="display: none;">No results found</p> </div>
+    <script>
+        const dateKey = "﻿\"date_time\"";
+        const searchBar = document.getElementById('searchBar');
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const minDebit = document.getElementById('minDebit');
+        const maxDebit = document.getElementById('maxDebit');
+        const tableBody = document.getElementById('tableBody');
+        const noResults = document.getElementById('noResults');
+        const timeTaken = document.getElementById('timeTaken');
+        const sortButton = document.getElementById('sortButton');
+        let allResults = [];
+        let currentResults = [];
 
-<script>
-    const searchBar = document.getElementById('searchBar');
-    const tableBody = document.getElementById('tableBody');
-    const noResults = document.getElementById('noResults');
-    const loading = document.getElementById('loading');
-    const timeTaken = document.getElementById('timeTaken');
-    const timingSection = document.getElementById('timing');
-
-    searchBar.addEventListener('keypress', function (event) {
-        if (event.key === 'Enter') {
-            const query = searchBar.value.trim();
-            if (query) {
-                fetchData(query);
+        searchBar.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                const query = searchBar.value.trim();
+                if (query) {
+                    fetchData(query);
+                }
             }
-        }
-    });
+        });
 
-    async function fetchData(query) {
-        try {
-            loading.style.display = 'block';
-            noResults.style.display = 'none';
-            timingSection.style.display = 'none';
-
+        async function fetchData(query) {
             const startTime = performance.now();
 
             const response = await fetch('http://127.0.0.1:5000/search', {
@@ -153,52 +246,98 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query })
+                body: JSON.stringify({ query }),
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            if (response.ok) {
+                const data = await response.json();
+                allResults = data.results;
+                currentResults = [...allResults];
+                filterAndDisplayResults();
             }
 
-            const data = await response.json();
-
             const endTime = performance.now();
-            const elapsedTime = Math.round(endTime - startTime);
-
-            timeTaken.textContent = elapsedTime;
-            timingSection.style.display = 'block';
-
-            updateTable(data.results);
-        } catch (error) {
-            console.error('Fetch error:', error);
-        } finally {
-            loading.style.display = 'none';
-        }
-    }
-
-
-    function updateTable(results) {
-        tableBody.innerHTML = '';
-
-        if (results.length === 0) {
-            noResults.style.display = 'block';
-            return;
-        } else {
-            noResults.style.display = 'none';
+            timeTaken.textContent = Math.round(endTime - startTime);
         }
 
+        function filterAndDisplayResults() {
+            const start = new Date(startDate.value);
+            const end = new Date(endDate.value);
+            const min = minDebit.value ? parseFloat(minDebit.value) : 0;
+            const max = maxDebit.value ? parseFloat(maxDebit.value) : Infinity;
 
-        results.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.trans_no}</td>
-                <td>${item["﻿\"date_time\""]}</td>
-                <td>${item.detail}</td>
-                <td>${item.credit}</td>
-                <td>${item.debit}</td>
-            `;
-            tableBody.appendChild(row);
+            let filteredResults = allResults;
+
+            if (startDate.value) {
+                filteredResults = filteredResults.filter(item =>
+                    new Date(item[dateKey].split("_")[0]) >= start
+
+                );
+            }
+
+            if (endDate.value) {
+                filteredResults = filteredResults.filter(item =>
+                    new Date(item[dateKey].split("_")[0]) <= end
+                );
+            }
+
+            filteredResults = filteredResults.filter(item => {
+                const debit = parseFloat(item.debit);
+                return debit >= min && debit <= max;
+            });
+
+            updateTable(filteredResults);
+        }
+
+        sortButton.addEventListener('click', function () {
+            const order = sortButton.getAttribute('data-order');
+            const newOrder = order === 'asc' ? 'desc' : order === 'desc' ? 'unsorted' : 'asc';
+            sortButton.textContent = `Thứ tự tổng tiền: ${newOrder === 'asc' ? 'Tăng dần' : newOrder === 'desc' ? 'Giảm dần' : 'Không'}`;
+            sortButton.setAttribute('data-order', newOrder);
+            sortResultsByTotal(newOrder);
         });
-    }
-</script>
-</body> </html>
+        function sortResultsByTotal(order) {
+            if (order === 'unsorted') {
+                updateTable([...allResults]); // Reset to original order
+                console.log('dsadsad');
+            } else {
+                console.log('pppppppppppp');
+                const sortedResults = [...currentResults].sort((a, b) => {
+                    const tA = parseFloat(a.debit + a.credit);
+                    const tB = parseFloat(b.debit + b.credit);
+                    return order === 'asc' ? tA - tB : tB - tA;
+                });
+
+                console.log(sortedResults);
+                updateTable(sortedResults);
+            }
+        }
+
+        function updateTable(results) {
+            tableBody.innerHTML = '';
+            if (results.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            } else {
+                noResults.style.display = 'none';
+            }
+
+            results.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.trans_no}</td>
+                    <td>${item[dateKey].split('_')[0]}</td>
+                    <td>${item.detail}</td>
+                    <td>${item.credit + item.debit}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        startDate.addEventListener('change', filterAndDisplayResults);
+        endDate.addEventListener('change', filterAndDisplayResults);
+        minDebit.addEventListener('input', filterAndDisplayResults);
+        maxDebit.addEventListener('input', filterAndDisplayResults);
+    </script>
+</body>
+</html>
