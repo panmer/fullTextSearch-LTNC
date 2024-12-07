@@ -53,7 +53,7 @@
         /* Filters Section */
         .filters {
             display: flex;
-            flex-wrap: wrap;
+            /* flex-wrap: wrap; */
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -178,7 +178,11 @@
 <body>
     <div class="container">
         <h1>Tìm kiếm giao dịch MTTQVN</h1>
-        <input type="text" id="searchBar" placeholder="Chọn từ khóa và bộ lọc mong muốn và nhán Enter..." />
+        <div style="display:flex;justify-content:start;gap:8px">
+        	<input type="text" id="searchBar" placeholder="Tìm kiếm bất kỳ từ khóa nào..." />
+	        <button class="sort-button" id="searchButton" >Tìm Kiếm &rarr;</button>
+        </div>
+
         <div class="filters">
             <label>
                 Ngày bắt đầu
@@ -196,11 +200,12 @@
                 Số tiền lớn nhất
                 <input type="number" id="maxDebit" min="0" placeholder="Unlimited" />
             </label>
+	    <button class="sort-button" id="sortButton" data-order="unsorted" >Thứ tự tổng tiền: Không</button>
         </div>
         <div id="timing">Thời gian tìm kiếm: <span id="timeTaken">0</span> ms</div>
 
 	<div style="display:flex;justify-content:center;align-items:center">
-        	<button class="sort-button" id="sortButton" data-order="unsorted" >Thứ tự tổng tiền: Không</button>
+        	        	      
         </div>
 
         <table id="resultTable">
@@ -221,6 +226,15 @@
     </div>
 
     <script>
+    	const toDateObjDDMMYYYY = (ddmmyy) => {
+    		let parts = ddmmyy.split('/').map(Number);
+		return new Date(parts[2], parts[1] - 1, parts[0]); 
+    	}
+    	const toDateObjMMDDYYYY = (mmddyy) => {
+    		let parts = mmddyy.split('/').map(Number);
+		return new Date(parts[2], parts[0] - 1, parts[1]); 
+    	}
+    	const queryURL = 'http://127.0.0.1:5000/search';
         const dateKey = "﻿\"date_time\"";
         const searchBar = document.getElementById('searchBar');
         const startDate = document.getElementById('startDate');
@@ -234,19 +248,22 @@
         let allResults = [];
         let currentResults = [];
 
-        searchBar.addEventListener('keypress', function (event) {
-            if (event.key === 'Enter') {
+	const queryEvent = function (event) {
+            if (!event.key || event.key === 'Enter') {
+            console.log('--=-=-=-=-=');
                 const query = searchBar.value.trim();
                 if (query) {
                     fetchData(query);
                 }
             }
-        });
+        };
+        searchBar.addEventListener('keypress', queryEvent);
+        document.getElementById('searchButton').addEventListener('click', queryEvent);
 
         async function fetchData(query) {
             const startTime = performance.now();
 
-            const response = await fetch('http://127.0.0.1:5000/search', {
+            const response = await fetch(queryURL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -257,8 +274,16 @@
             if (response.ok) {
                 const data = await response.json();
                 allResults = data.results;
+                if (!allResults?.length) {
+			startDate.style.visibility = "hidden";
+			endDate.style.visibility = "hidden";
+			sortButton.style.visibility = "hidden";
+			maxDebit.style.visibility = "hidden";
+			minDebit.style.visibility = "hidden";
+		}
                 currentResults = [...allResults];
-                filterAndDisplayResults();
+                // filterAndDisplayResults();
+                updateTable(currentResults);
             }
 
             const endTime = performance.now();
@@ -287,8 +312,8 @@
             }
 
             filteredResults = filteredResults.filter(item => {
-                const debit = parseFloat(item.debit);
-                return debit >= min && debit <= max;
+                const total = parseFloat(item.debit + item.credit);
+                return total >= min && total <= max;
             });
 
             updateTable(filteredResults);
