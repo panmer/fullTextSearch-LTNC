@@ -123,11 +123,14 @@
             background-color: #e8ffe8; /* Light green for alternating rows */
         }
 
-        table tbody tr:hover {
-            background-color: #c8ffc8; /* Highlight on hover */
-            transition: background-color 0.3s ease;
+        tr:hover {
+            background-color: green; /* Highlight on hover */
+            /* transition: background-color 0.3s ease; */
         }
-
+        .hover-limegreen:hover {
+            background-color: limegreen; /* Highlight on hover */
+            /* transition: background-color 0.3s ease; */
+        }
         .no-results {
             text-align: center;
             color: #555;
@@ -196,7 +199,9 @@
         </div>
         <div id="timing">Thời gian tìm kiếm: <span id="timeTaken">0</span> ms</div>
 
-        <button class="sort-button" id="sortButton" data-order="unsorted">Thứ tự tổng tiền: Không</button>
+	<div style="display:flex;justify-content:center;align-items:center">
+        	<button class="sort-button" id="sortButton" data-order="unsorted" >Thứ tự tổng tiền: Không</button>
+        </div>
 
         <table id="resultTable">
             <thead>
@@ -325,11 +330,12 @@
             results.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${item.trans_no}</td>
+                    <td class="hover-limegreen">${item.trans_no}</td>
                     <td>${item[dateKey].split('_')[0]}</td>
                     <td>${item.detail}</td>
                     <td>${item.credit + item.debit}</td>
                 `;
+                // row.classList.add('hover-green');
                 tableBody.appendChild(row);
             });
         }
