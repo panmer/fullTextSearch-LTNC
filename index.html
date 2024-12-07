@@ -123,8 +123,8 @@
             background-color: #e8ffe8; /* Light green for alternating rows */
         }
 
-        tr:hover {
-            background-color: green; /* Highlight on hover */
+        tr:hover td {
+            background-color: limegreen; /* Highlight on hover */
             /* transition: background-color 0.3s ease; */
         }
         .hover-limegreen:hover {
@@ -183,7 +183,7 @@
 	        <button class="sort-button" id="searchButton" >Tìm Kiếm &rarr;</button>
         </div>
 
-        <div class="filters">
+        <!-- <div class="filters">
             <label>
                 Ngày bắt đầu
                 <input type="date" id="startDate" />
@@ -200,8 +200,8 @@
                 Số tiền lớn nhất
                 <input type="number" id="maxDebit" min="0" placeholder="Unlimited" />
             </label>
-	    <button class="sort-button" id="sortButton" data-order="unsorted" >Thứ tự tổng tiền: Không</button>
-        </div>
+	        <button class="sort-button" id="sortButton" data-order="unsorted" >Thứ tự tổng tiền: Không</button>
+        </div> -->
         <div id="timing">Thời gian tìm kiếm: <span id="timeTaken">0</span> ms</div>
 
 	<div style="display:flex;justify-content:center;align-items:center">
@@ -354,6 +354,7 @@
 
             results.forEach(item => {
                 const row = document.createElement('tr');
+                // row.classList.add('hover-limegreen');
                 row.innerHTML = `
                     <td class="hover-limegreen">${item.trans_no}</td>
                     <td>${item[dateKey].split('_')[0]}</td>
